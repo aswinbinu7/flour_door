@@ -31,72 +31,91 @@ class _AddFoodPageState extends State<AddFoodPage> {
   }
 
   void _addFood() async {
-    String foodName = _foodNameController.text.trim();
-    double price = double.parse(_priceController.text.trim());
-    String description = _descriptionController.text.trim();
-
-    FoodModel food = FoodModel(
-      // Since your food_id is now autoincrementing, you don't need to generate it manually
-      // food_id: DateTime.now().millisecondsSinceEpoch.toString(),
-      food_name: foodName,
-      price: price,
-      description: description,
-    );
-
-    // Save the food to the database
-    await _dbHelper.saveFood(food);
-
-    // Fetch all items from the database
-    List<FoodModel> allFoods = await _dbHelper.getAllFoods();
-
-    // Print the details of all items in the database
-    print('Current Food Items:');
-    for (FoodModel item in allFoods) {
-      print('Food ID: ${item.food_id}');
-      print('Food Name: ${item.food_name}');
-      print('Price: \$${item.price.toStringAsFixed(2)}');
-      print('Description: ${item.description}');
-      print('--------------------');
+    if (_foodNameController.text.isEmpty || _priceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill out all fields')),
+      );
+      return;
     }
 
-    // Pop the food details page after adding food
-    Navigator.pop(context);
+    try {
+      double price = double.parse(_priceController.text.trim());
+      FoodModel food = FoodModel(
+        food_name: _foodNameController.text.trim(),
+        price: price,
+        description: _descriptionController.text.trim(),
+      );
+      await _dbHelper.saveFood(food);
+      Navigator.pop(context, true); // return true if food is added
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding product: ${e.toString()}')),
+      );
+    }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Food Details'),
+        title: Text('Add Product Details'),
+        backgroundColor: Colors.orange[600],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _foodNameController,
-              decoration: InputDecoration(labelText: 'Food Name'),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            color: Colors.white,
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: _foodNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Product Name',
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange[800]!),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: _priceController,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      labelText: 'Price',
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange[800]!),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: _descriptionController,
+                    decoration: InputDecoration(
+                      labelText: 'Description',
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.orange[800]!),
+                      ),
+                    ),
+                    maxLines: 3,
+                  ),
+                  SizedBox(height: 32.0),
+                  ElevatedButton(
+                    onPressed: _addFood,
+                    child: Text('Add Product'),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange[800]),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: _priceController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(labelText: 'Price'),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Description'),
-            ),
-            SizedBox(height: 32.0),
-            ElevatedButton(
-              onPressed: _addFood,
-              child: Text('Add Food'),
-            ),
-          ],
+          ),
         ),
       ),
     );

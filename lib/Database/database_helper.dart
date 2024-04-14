@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:io' as io;
 
+import '../Model/FeedbackModel.dart';
 import '../Model/OrderModel.dart';
 import '../Model/PaymentModel.dart';
 import '../Model/UserModel.dart';
@@ -18,6 +20,7 @@ class DbHelper {
   static const String Table_Food = 'food';
   static const String Table_Order = 'orders'; // Renamed table to "orders"
   static const String Table_Payment = 'payment';
+  static const String Table_Feedback = 'feedback';
 
   // Columns for user table
   static const String C_UserID = 'user_id';
@@ -48,6 +51,11 @@ class DbHelper {
   static const String C_PaymentMethod = 'payment_method';
   static const String C_PaymentDate = 'payment_date';
   static const String C_RelatedOrderID = 'related_order_id';
+
+  // Feedback table
+  static const String C_FeedbackID = 'feedback_id';
+  static const String C_FeedbackUserName = 'user_name';
+  static const String C_UserFeedback = 'user_feedback';
 
   static const int Version = 1;
 
@@ -111,6 +119,14 @@ class DbHelper {
         " $C_RelatedOrderID INTEGER, "
         " FOREIGN KEY ($C_RelatedOrderID) REFERENCES $Table_Order($C_OrderID) "
         ")");
+
+    // Create feedback table
+    await db.execute("CREATE TABLE $Table_Feedback ("
+        " $C_FeedbackID INTEGER PRIMARY KEY AUTOINCREMENT, "
+        " $C_FeedbackUserName TEXT NOT NULL, "
+        " $C_UserFeedback TEXT NOT NULL"
+        ")");
+
   }
 
   Future<int> saveUser(UserModel user) async {
@@ -389,5 +405,21 @@ class DbHelper {
       return [];
     }
   }
+
+  // Method to insert feedback using a Feedback object
+  Future<void> insertFeedback(UserFeedback feedback) async {
+    final dbClient = await db;
+    await dbClient?.insert(Table_Feedback, feedback.toMap());
+  }
+
+  Future<List<UserFeedback>> getFeedbacks() async {
+    final db = await this.db;
+    final List<Map<String, dynamic>> maps = await db!.query(DbHelper.Table_Feedback);
+
+    return List.generate(maps.length, (i) {
+      return UserFeedback.fromMap(maps[i] as Map<String, dynamic>);
+    });
+  }
+
 
 }

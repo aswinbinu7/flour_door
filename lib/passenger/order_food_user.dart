@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Database/database_helper.dart';
 import '../Model/OrderModel.dart';
 import '../Model/FoodModel.dart';
@@ -21,12 +22,22 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     _fetchOrders();
   }
 
-  void _fetchOrders() async {
-    List<OrderModel> orders = await _dbHelper.getAllOrders();
-    setState(() {
-      _orders = orders;
-    });
+  Future<int> _getUserId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id') ?? 0; // Ensure you have set 'user_id' when the user logs in or registers
   }
+
+
+  void _fetchOrders() async {
+    int userId = await _getUserId(); // Fetch user ID from SharedPreferences
+    if (userId != 0) {
+      List<OrderModel> orders = await _dbHelper.getOrdersByUserId(userId);
+      setState(() {
+        _orders = orders;
+      });
+    }
+  }
+
 
   void _deleteOrder(int? orderId) async {
     if (orderId != null) {

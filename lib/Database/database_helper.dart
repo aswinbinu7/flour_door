@@ -335,4 +335,59 @@ class DbHelper {
     return res;
   }
 
+  // Method to print user table
+  Future<void> printUserTable() async {
+    final dbClient = await db;
+    List<Map> list = await dbClient!.query(Table_User);
+    print("User Table Data: ");
+    list.forEach((row) {
+      print(row);
+    });
+  }
+
+  // Method to print food table
+  Future<void> printFoodTable() async {
+    final dbClient = await db;
+    List<Map> list = await dbClient!.query(Table_Food);
+    print("Food Table Data: ");
+    list.forEach((row) {
+      print(row);
+    });
+  }
+
+  // Method to print orders table
+  Future<void> printOrdersTable() async {
+    final dbClient = await db;
+    List<Map> list = await dbClient!.query(Table_Order);
+    print("Orders Table Data: ");
+    list.forEach((row) {
+      print(row);
+    });
+  }
+
+  // Method to print payment table
+  Future<void> printPaymentTable() async {
+    final dbClient = await db;
+    List<Map> list = await dbClient!.query(Table_Payment);
+    print("Payment Table Data: ");
+    list.forEach((row) {
+      print(row);
+    });
+  }
+
+  Future<List<OrderModel>> getOrdersByUserId(int userId) async {
+    var dbClient = await db; // Get the database instance
+    if (dbClient != null) {
+      List<Map<String, dynamic>> result = await dbClient.query(
+          Table_Order,
+          where: '$C_OrderUserID = ?', // Use the column name for user ID in orders table
+          whereArgs: [userId]
+      );
+
+      return result.map((data) => OrderModel.fromMap(data)).toList();
+    } else {
+      return [];
+    }
+  }
+
 }

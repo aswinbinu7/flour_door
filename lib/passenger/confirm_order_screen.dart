@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/FoodModel.dart';
 import '../Model/OrderModel.dart';
 import '../Database/database_helper.dart';
@@ -40,6 +41,11 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     super.dispose();
   }
 
+  Future<int> _fetchUserId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id') ?? 0; // Assuming 'user_id' is set in SharedPreferences
+  }
+
   void _confirmOrder() async {
     // Extract data from text controllers
     String fullName = _fullNameController.text;
@@ -47,13 +53,18 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     int contactNumber = int.tryParse(_contactNumberController.text) ?? 0;
     String address = _addressCustomController.text;
 
+    int userId = await _fetchUserId();
+    if (userId == 0) {
+      return;
+    }
+
 
     // Save order to database
     try {
       DbHelper dbHelper = DbHelper();
       for (int i = 0; i < widget.selectedFoodItems.length; i++) {
         OrderModel order = OrderModel(
-          orderUserId: 1, // You need to set the actual user ID here
+          orderUserId: userId, // You need to set the actual user ID here
           orderFoodId: widget.selectedFoodItems[i].food_id,
           quantity: widget.selectedQuantities[i],
           orderTime: DateTime.now().toString(),
@@ -137,47 +148,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(labelText: 'Address'),
               ),
-              // TextFormField(
-              //   controller: _trainNameCustomController,
-              //   decoration: InputDecoration(labelText: 'Train Name'),
-              // ),
-              // DropdownButtonFormField<String>(
-              //   value: _selectedCompartment,
-              //   onChanged: (String? value) {
-              //     setState(() {
-              //       _selectedCompartment = value!;
-              //     });
-              //   },
-              //   decoration: InputDecoration(labelText: 'Compartment'),
-              //   items: ['General', 'Sleeper', 'AC', 'Sitting Chair']
-              //       .map<DropdownMenuItem<String>>((String value) {
-              //     return DropdownMenuItem<String>(
-              //       value: value,
-              //       child: Text(value),
-              //     );
-              //   }).toList(),
-              // ),
-              // DropdownButtonFormField<String>(
-              //   value: _selectedBogie,
-              //   onChanged: (String? value) {
-              //     setState(() {
-              //       _selectedBogie = value!;
-              //     });
-              //   },
-              //   decoration: InputDecoration(labelText: 'Bogie'),
-              //   items: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8']
-              //       .map<DropdownMenuItem<String>>((String value) {
-              //     return DropdownMenuItem<String>(
-              //       value: value,
-              //       child: Text(value),
-              //     );
-              //   }).toList(),
-              // ),
-              // TextFormField(
-              //   controller: _seatNumberController,
-              //   keyboardType: TextInputType.number,
-              //   decoration: InputDecoration(labelText: 'Seat Number'),
-              // ),
 
               SizedBox(height: 20.0),
               Center(

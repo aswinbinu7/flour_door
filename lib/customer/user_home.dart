@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import '../Model/FeedbackModel.dart';
 import '../database/database_helper.dart';
 import '../login/login_screen.dart';
+import 'booking.dart';
 import 'feedback_user.dart';
 import 'order_food_user.dart';
 import 'user_profile.dart';
@@ -182,6 +183,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       title: 'Feedback',
       icon: Icons.feedback,
       onPressed: () => FeedbackScreen(),
+    ),
+    FunctionalityItem(
+      title: 'Booking',
+      icon: Icons.feedback,
+      onPressed: () => ViewTimeSlotsScreen(),
     ),
   ];
 }

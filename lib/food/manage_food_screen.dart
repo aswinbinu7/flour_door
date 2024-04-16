@@ -97,7 +97,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         FoodModel food = _foodItems[index];
         return ListTile(
           title: Text(food.food_name),
-          subtitle: Text('\$${food.price.toStringAsFixed(2)}'),
+          subtitle: Text('₹${food.price.toStringAsFixed(2)}'),
           trailing: IconButton(
             icon: Icon(Icons.delete, color: Colors.red),
             onPressed: () => _confirmDelete(index), // Call confirm delete method on press

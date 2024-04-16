@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -9,6 +7,7 @@ import 'dart:io' as io;
 import '../Model/FeedbackModel.dart';
 import '../Model/OrderModel.dart';
 import '../Model/PaymentModel.dart';
+import '../Model/TimeSlotModel.dart';
 import '../Model/UserModel.dart';
 import '../Model/FoodModel.dart';
 
@@ -21,13 +20,13 @@ class DbHelper {
   static const String Table_Order = 'orders'; // Renamed table to "orders"
   static const String Table_Payment = 'payment';
   static const String Table_Feedback = 'feedback';
+  static const String Table_TimeSlots = 'time_slots';
 
   // Columns for user table
   static const String C_UserID = 'user_id';
   static const String C_UserName = 'user_name';
   static const String C_Email = 'email';
   static const String C_Password = 'password';
-
 
   // Columns for food table
   static const String C_FoodID = 'food_id';
@@ -46,16 +45,25 @@ class DbHelper {
   static const String C_ContactNumber = 'contact_number'; // New field
   static const String C_Address = 'address'; // New field
 
-  // Payment table
+  // Columns for payment table
   static const String C_PaymentID = 'payment_id';
   static const String C_PaymentMethod = 'payment_method';
   static const String C_PaymentDate = 'payment_date';
   static const String C_RelatedOrderID = 'related_order_id';
 
-  // Feedback table
+  // Columns for feedback table
   static const String C_FeedbackID = 'feedback_id';
   static const String C_FeedbackUserName = 'user_name';
   static const String C_UserFeedback = 'user_feedback';
+
+  // Columns for time slots table
+  static const String C_SlotID = 'slot_id';
+  static const String C_StartTime = 'start_time';
+  static const String C_EndTime = 'end_time';
+  static const String C_IsBooked = 'is_booked';  // 0 = available, 1 = booked
+  static const String C_BookedBy = 'booked_by';  // User ID of the user who booked the slot
+  static const String C_BookedByName = 'booked_by_name';  // Name of the person who booked the slot
+  static const String C_BookedByContact = 'booked_by_contact';  // Contact of the person who booked the slot
 
   static const int Version = 1;
 
@@ -71,10 +79,7 @@ class DbHelper {
     io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, DB_Name);
     var db = await openDatabase(path, version: Version, onCreate: _onCreate);
-
-    // Enable foreign key support using a SQL command
     await db.execute("PRAGMA foreign_keys = ON;");
-
     return db;
   }
 
@@ -83,18 +88,15 @@ class DbHelper {
     await db.execute("CREATE TABLE $Table_User ("
         " $C_UserID INTEGER PRIMARY KEY AUTOINCREMENT, "
         " $C_UserName TEXT, "
-        " $C_Email TEXT,"
-        " $C_Password TEXT "
-        ")");
-
+        " $C_Email TEXT, "
+        " $C_Password TEXT)");
 
     // Create food table
     await db.execute("CREATE TABLE $Table_Food ("
         " $C_FoodID INTEGER PRIMARY KEY AUTOINCREMENT, "
         " $C_FoodName TEXT, "
-        " $C_Price REAL,"
-        " $C_Description TEXT "
-        ")");
+        " $C_Price REAL, "
+        " $C_Description TEXT)");
 
     // Create order table
     await db.execute("CREATE TABLE $Table_Order ("
@@ -106,7 +108,7 @@ class DbHelper {
         " $C_FullName TEXT, " // Added fullName column
         " $C_EmailAddress TEXT, " // Added emailAddress column
         " $C_ContactNumber INTEGER, " // Added contactNumber column
-        " $C_Address TEXT, " // Added trainNameCustom column
+        " $C_Address TEXT, "
         " FOREIGN KEY ($C_OrderUserID) REFERENCES $Table_User($C_UserID), "
         " FOREIGN KEY ($C_OrderFoodID) REFERENCES $Table_Food($C_FoodID) "
         ")");
@@ -117,16 +119,24 @@ class DbHelper {
         " $C_PaymentMethod TEXT, "
         " $C_PaymentDate TEXT, "
         " $C_RelatedOrderID INTEGER, "
-        " FOREIGN KEY ($C_RelatedOrderID) REFERENCES $Table_Order($C_OrderID) "
-        ")");
+        " FOREIGN KEY ($C_RelatedOrderID) REFERENCES $Table_Order($C_OrderID))");
 
     // Create feedback table
     await db.execute("CREATE TABLE $Table_Feedback ("
         " $C_FeedbackID INTEGER PRIMARY KEY AUTOINCREMENT, "
         " $C_FeedbackUserName TEXT NOT NULL, "
-        " $C_UserFeedback TEXT NOT NULL"
-        ")");
+        " $C_UserFeedback TEXT NOT NULL)");
 
+    // Create time slots table
+    await db.execute("CREATE TABLE $Table_TimeSlots ("
+        " $C_SlotID INTEGER PRIMARY KEY AUTOINCREMENT, "
+        " $C_StartTime TEXT NOT NULL, "
+        " $C_EndTime TEXT NOT NULL, "
+        " $C_IsBooked INTEGER DEFAULT 0, "
+        " $C_BookedBy INTEGER, "
+        " $C_BookedByName TEXT, "
+        " $C_BookedByContact TEXT, "
+        " FOREIGN KEY ($C_BookedBy) REFERENCES $Table_User($C_UserID))");
   }
 
   Future<int> saveUser(UserModel user) async {
@@ -381,6 +391,16 @@ class DbHelper {
     });
   }
 
+  // Method to print orders table
+  Future<void> printSlotTable() async {
+    final dbClient = await db;
+    List<Map> list = await dbClient!.query(Table_TimeSlots);
+    print("Slots Table Data: ");
+    list.forEach((row) {
+      print(row);
+    });
+  }
+
   // Method to print payment table
   Future<void> printPaymentTable() async {
     final dbClient = await db;
@@ -421,5 +441,96 @@ class DbHelper {
     });
   }
 
+  // Add a new time slot
+  Future<void> addTimeSlot(TimeSlot slot) async {
+    final dbClient = await db; // make sure you have a getter for `db`
+    await dbClient!.insert(
+      Table_TimeSlots, // Table name as defined in DbHelper
+      slot.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+
+// Fetch all available time slots
+  Future<List<Map<String, dynamic>>> fetchAvailableSlots() async {
+    var dbClient = await db;
+    var result = await dbClient!.query(
+      Table_TimeSlots,
+      where: "$C_IsBooked = ?",
+      whereArgs: [0],
+    );
+    return result;
+  }
+
+// Book a time slot
+  Future<void> bookTimeSlot(int slotId, int userId) async {
+    var dbClient = await db;
+    await dbClient!.update(
+      Table_TimeSlots,
+      {
+        C_IsBooked: 1,
+        C_BookedBy: userId,
+      },
+      where: "$C_SlotID = ?",
+      whereArgs: [slotId],
+    );
+  }
+
+  // Method to fetch all time slots
+  Future<List<TimeSlot>> getAllSlots() async {
+    final dbClient = await db;
+    final List<Map<String, dynamic>> maps = await dbClient!.query(DbHelper.Table_TimeSlots);
+    return List.generate(maps.length, (i) {
+      return TimeSlot.fromMap(maps[i]);
+    });
+  }
+
+// Method to fetch only available slots
+  Future<List<TimeSlot>> getAvailableSlots() async {
+    final dbClient = await db;
+    final List<Map<String, dynamic>> maps = await dbClient!.query(
+      DbHelper.Table_TimeSlots,
+      where: '${DbHelper.C_IsBooked} = ?',
+      whereArgs: [0],  // 0 means not booked
+    );
+    return List.generate(maps.length, (i) {
+      return TimeSlot.fromMap(maps[i]);
+    });
+  }
+
+  // Method to update a time slot
+  Future<void> updateTimeSlot(TimeSlot slot) async {
+    final dbClient = await db;
+    await dbClient!.update(
+      Table_TimeSlots,
+      slot.toMap(),
+      where: '$C_SlotID = ?',
+      whereArgs: [slot.slotId],
+    );
+  }
+
+  Future<List<TimeSlot>> getBookedSlots() async {
+    var dbClient = await db;
+    var result = await dbClient!.query(
+        Table_TimeSlots,
+        where: '$C_IsBooked = ?',
+        whereArgs: [1]
+    );
+
+    List<TimeSlot> slots = result.isNotEmpty
+        ? result.map((item) => TimeSlot.fromMap(item)).toList()
+        : [];
+    return slots;
+  }
+
+  Future<void> deleteTimeSlot(int slotId) async {
+    var dbClient = await db;
+    await dbClient!.delete(
+      Table_TimeSlots,
+      where: '$C_SlotID = ?',
+      whereArgs: [slotId],
+    );
+  }
 
 }

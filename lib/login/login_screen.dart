@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Database/auth_service.dart';
+import '../customer/user_home.dart';
 import '../manage_food/select_functionality_screen.dart';
-import '../passenger/user_home.dart';
 import 'signup_screen.dart';
 import 'forget_password.dart';
 
@@ -29,10 +29,9 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: 20.0),
-                  // Increased size of the logo
                   Image.asset(
                     'assets/flour mill.png', // Ensure this path is correct
-                    height: 180, // Increased image height
+                    height: 180,
                   ),
                   SizedBox(height: 30.0),
                   TextField(
@@ -41,7 +40,10 @@ class LoginScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       labelText: 'Username',
                       labelStyle: TextStyle(color: Colors.deepOrange),
-                      border: OutlineInputBorder(),
+                      border: UnderlineInputBorder(),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.deepOrange),
+                      ),
                     ),
                   ),
                   SizedBox(height: 20.0),
@@ -52,7 +54,10 @@ class LoginScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       labelText: 'Password',
                       labelStyle: TextStyle(color: Colors.deepOrange),
-                      border: OutlineInputBorder(),
+                      border: UnderlineInputBorder(),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.deepOrange),
+                      ),
                     ),
                   ),
                   SizedBox(height: 20.0),

@@ -94,9 +94,9 @@ class _OrderScreenState extends State<OrdersScreen> {
                                     children: [
                                       Text('Product Details:', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                                       Text('Product Name: ${food.food_name}'),
-                                      Text('Price per Item: \$${food.price}'),
+                                      Text('Price per Item: ₹${food.price}'),
                                       Text('Quantity: ${order.quantity}'),
-                                      Text('Total Price: \$${totalItemPrice.toStringAsFixed(2)}'),
+                                      Text('Total Price: ₹${totalItemPrice.toStringAsFixed(2)}'),
                                       SizedBox(height: 10),
                                       Text('Customer Details:', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                                       Text('Full Name: ${order.fullName}'),

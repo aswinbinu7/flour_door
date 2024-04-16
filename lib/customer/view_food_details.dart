@@ -113,9 +113,9 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                           ),
                           SizedBox(height: 10.0),
                           Text(
-                            'Price: \$${_foodList[index].price}',
-                            style: TextStyle(fontSize: 16.0, color: Colors.black87),
-                          ),
+                              'Price: ₹${_foodList[index].price}',
+                              style: TextStyle(fontSize: 16.0, color: Colors.black87),
+                            ),
                           SizedBox(height: 10.0),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

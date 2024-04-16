@@ -35,7 +35,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                    color: Colors.orange,
                   ),
                 ),
                 SizedBox(height: 30),
@@ -43,7 +43,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: usernameController,
                   decoration: InputDecoration(
                     labelText: 'Username',
-                    border: OutlineInputBorder(),
+                    border: UnderlineInputBorder(),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.orange),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -57,7 +60,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    border: OutlineInputBorder(),
+                    border: UnderlineInputBorder(),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.orange),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -73,7 +79,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(),
+                    border: UnderlineInputBorder(),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.orange),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -112,7 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.orange,
                   ),
                   child: Text(
                     'Sign Up',
@@ -135,7 +144,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Text(
                     'Already have an account? Log in',
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: Colors.orange,
                       fontSize: 16,
                     ),
                   ),

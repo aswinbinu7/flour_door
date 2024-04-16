@@ -163,7 +163,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 style: TextStyle(fontSize: 14.0),
               ),
               Text(
-                'Price per Item: \$${food.price}',
+                'Price per Item: ₹${food.price}',
                 style: TextStyle(fontSize: 14.0),
               ),
               Text(
@@ -171,7 +171,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 style: TextStyle(fontSize: 14.0),
               ),
               Text(
-                'Total Price: \$${totalItemPrice.toStringAsFixed(2)}',
+                'Total Price: ₹${totalItemPrice.toStringAsFixed(2)}',
                 style: TextStyle(fontSize: 14.0),
               ),
             ],

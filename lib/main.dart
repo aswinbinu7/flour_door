@@ -13,6 +13,7 @@ void main() async {
   await dbHelper.printUserTable();
   await dbHelper.printFoodTable();
   await dbHelper.printOrdersTable();
+  await dbHelper.printSlotTable();
   await dbHelper.printPaymentTable();
 
   runApp(MyApp());

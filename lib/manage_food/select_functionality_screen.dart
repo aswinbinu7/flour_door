@@ -1,7 +1,9 @@
+import 'package:flour_door/manage_food/view_slot_booked.dart';
 import 'package:flutter/material.dart';
 import '../Database/database_helper.dart';
 import '../Model/FeedbackModel.dart';
 import '../login/login_screen.dart';
+import 'add_slots.dart';
 import 'list_users.dart';
 import '../food/manage_food_screen.dart';
 import 'orders_screen.dart';
@@ -123,6 +125,28 @@ class _SelectFunctionalityScreenState extends State<SelectFunctionalityScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ListUsers()),
+          );
+        },
+      ),
+      FunctionalityItem(
+        title: 'BOOK SLOTS',
+        icon: Icons.list_alt,
+        color: Colors.black,
+        onPressed: (context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddTimeSlotScreen()),
+          );
+        },
+      ),
+      FunctionalityItem(
+        title: 'SLOTS BOOKED',
+        icon: Icons.list_alt,
+        color: Colors.black,
+        onPressed: (context) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ViewBookedSlotsScreen()),
           );
         },
       ),

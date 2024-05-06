@@ -50,7 +50,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     String greeting = getGreeting();
     return Scaffold(
       appBar: AppBar(
-        title: Text('$greeting, User'),
+        title: Text('$greeting'),
         backgroundColor: Colors.orange,
         actions: <Widget>[
           IconButton(
